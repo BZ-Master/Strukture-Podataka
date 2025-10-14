@@ -12,6 +12,7 @@ typedef struct _Student
 	char name[MAX_CHAR];
 	char surname[MAX_CHAR];
 	int points;
+	Position next;
 } Student;
 
 int main() {
