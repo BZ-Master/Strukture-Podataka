@@ -41,7 +41,7 @@ int main()
 
 	do {
 		printf("Type a number 1-5 for listed actions or 0 to end program: ");
-		if (!scanf("%d", &action)) {
+		if (!scanf(" %d", &action)) {
 			printf("Scanf error while choosing action\n");
 			exit(ERROR_SCANF);
 			continue;
@@ -49,7 +49,7 @@ int main()
 		switch (action) 
 		{
 			case 0:
-				printf("Program ended!\n");
+				printf("Program ended by user!\n");
 				break;
 
 			case 1:
@@ -70,11 +70,8 @@ int main()
 					printf("Scanf error while entering surname to find\n");
 					exit(ERROR_SCANF);
 				}
-				else {
-					if (findBySurname(&head, surname) == NULL) printf("Person not found!\n");
-	
-					else printf("Person found!\n");
-				}
+				else 
+					findBySurname(&head, surname) == NULL;
 				break;
 
 			case 5:
@@ -83,10 +80,8 @@ int main()
 					printf("Scanf error while entering surname to delete\n");
 					exit(ERROR_SCANF);
 				}
-				else {
-					if (deletePerson(&head, surname) == EXIT_SUCCESS) printf("Person with surname %s deleted!\n", surname);
-					else printf("Person not found!\n");
-				}
+				else
+					deletePerson(&head, surname);
 				break;
 
 			default:
@@ -108,21 +103,21 @@ Position createPerson()
 	} 
 
 	printf("New person's name: ");
-	if (!scanf("%s", newPerson->name)) 
+	if (!scanf(" %s", newPerson->name)) 
 	{ 
 		printf("Scanf error");
 		exit(ERROR_SCANF); 
 	}
 
 	printf("New person's surname: ");
-	if (!scanf("%s", newPerson->surname)) 
+	if (!scanf(" %s", newPerson->surname)) 
 	{
 		printf("Scanf error");
 		exit(ERROR_SCANF);
 	}
 
 	printf("New person's birth year: ");
-	if (!scanf("%d", &newPerson->birthYear)) 
+	if (!scanf(" %d", &newPerson->birthYear)) 
 	{
 		printf("Scanf error");
 		exit(ERROR_SCANF);
@@ -135,7 +130,7 @@ int addToBeginning(Position head)
 {
 	Position newPerson = createPerson();
 	if (!newPerson) {
-		printf("Memory allocation error");
+		printf("Memory allocation error\n");
 		return ERROR_MALLOC;
 	}
 	newPerson->next = head->next;
@@ -146,7 +141,7 @@ int addToBeginning(Position head)
 int printList(Position head) 
 {
 	if (head->next == NULL) {
-		printf("Linked list is empty!");
+		printf("Linked list is empty!\n");
 		return EXIT_SUCCESS;
 	}
 
@@ -164,7 +159,7 @@ int addToEnd(Position head)
 {
 	Position newPerson = createPerson();
 	if (!newPerson) {
-		printf("Memory allocation error");
+		printf("Memory allocation error\n");
 		return ERROR_MALLOC;
 	}
 
@@ -186,36 +181,33 @@ Position findBySurname(Position head, char *surname)
 	
 	while (head->next != NULL)
 	{
-		if (strcmp(head->surname, surname) != 0)
+		if (strcmp(head->next->surname, surname) != 0)
 			head = head->next;
-		else
-			return head;
+		else 
+		{
+			printf("Person with surname %s found!\n", head->next->surname);
+			return head->next;
+		}
+			
 	}
-
+	printf("Person with surname %s not found!\n", surname);
 	return NULL;
 }
 
-int deletePerson(Position head, char *surname)
+int deletePerson(Position head, char* surname)
 {
-	Position personToDelete = findBySurname(&head, surname);
+	Position personToDelete = findBySurname(head, surname);
 	if (personToDelete == NULL) return ERROR_USER;
 
-	Position previousPerson = NULL;
+	Position previousPerson = head;
+	while (previousPerson->next != NULL && previousPerson->next != personToDelete)
+		previousPerson = previousPerson->next;
 
-	while (head->next != NULL)
-	{
-		if (strcmp(head->surname, surname) == 0)
-			previousPerson = head;
-			break;
-	}
-
-	if (previousPerson == NULL) {
-		printf("Previous person of the person to delete not found\n");
-		return ERROR_USER;
-	}
+	if (previousPerson->next == NULL) return ERROR_USER;
 
 	previousPerson->next = personToDelete->next;
 	personToDelete->next = NULL;
 	free(personToDelete);
+	printf("Person with surname %s deleted!\n", surname);
 	return EXIT_SUCCESS;
 }
