@@ -71,7 +71,7 @@ int main()
 					exit(ERROR_SCANF);
 				}
 				else 
-					findBySurname(&head, surname) == NULL;
+					findBySurname(&head, surname);
 				break;
 
 			case 5:
