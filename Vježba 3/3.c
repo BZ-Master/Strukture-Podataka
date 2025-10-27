@@ -25,11 +25,11 @@ int addToBeginning(Position);
 int printList(Position);
 int addToEnd(Position);
 Position findBySurname(Position, char*);
-Position findPreviousPersonBySurname(Position, char*);
+Position findPreviousPerson(Position, Position);
 int deletePerson(Position, char*);
 int addAfter(Position, char *);
 int addBefore(Position, char*);
-int swapElements(Position, Position, Position);
+int swapElements(Position, Position);
 int sortList(Position);
 int writeListIntoFile(Position);
 int readListFromFile(Position);
@@ -48,9 +48,11 @@ int main()
 
 	printf("Choose Action from the list:\n1 - Add new Person to the top of the list\n2 - Print list\n3 - Add new Person to the end of the list\n4 - Find a Person by surname\n5 - Delete a Person from the list\n6 - Add a Person after another Person\n7 - Add a Person before another Person\n8 - Sort list by surnames\n9 - Wite list into a file\n10 - Read list from a file\n");
 
-	do {
+	do 
+	{
 		printf("Type a number 1-5 for listed actions or 0 to end program: ");
-		if (!scanf(" %d", &action)) {
+		if (scanf(" %d", &action) != 1) 
+		{
 			printf("Scanf error while choosing action\n");
 			exit(ERROR_SCANF);
 			continue;
@@ -75,7 +77,8 @@ int main()
 
 		case 4:
 			printf("Enter surname of a Person to find: ");
-			if (!scanf("%s", surname)) {
+			if (scanf(" %s", surname) != 1) 
+			{
 				printf("Scanf error while entering surname to find\n");
 				exit(ERROR_SCANF);
 			}
@@ -85,7 +88,8 @@ int main()
 
 		case 5:
 			printf("Enter surname of a Person to delete: ");
-			if (!scanf("%s", surname)) {
+			if (scanf(" %s", surname) != 1) 
+			{
 				printf("Scanf error while entering surname to delete\n");
 				exit(ERROR_SCANF);
 			}
@@ -95,7 +99,8 @@ int main()
 
 		case 6:
 			printf("Enter surname of Person to add new Person after: ");
-			if (!scanf("%s", surname)) {
+			if (!scanf(" %s", surname)) 
+			{
 				printf("Scanf error while entering surname to add after\n");
 				exit(ERROR_SCANF);
 			}
@@ -104,7 +109,8 @@ int main()
 
 		case 7:
 			printf("Enter surname of Person to add new Person before: ");
-			if (!scanf("%s", surname)) {
+			if (scanf(" %s", surname) != 1) 
+			{
 				printf("Scanf error while entering surname to add before\n");
 				exit(ERROR_SCANF);
 			}
@@ -135,31 +141,34 @@ int main()
 Position createPerson()
 {
 	Position newPerson = (Position)malloc(sizeof(Person));
-	if (!newPerson) {
+	if (!newPerson) 
+	{
 		printf("Memory allocation error");
 		exit(ERROR_MALLOC);
 	}
 
 	printf("New person's name: ");
-	if (!scanf(" %s", newPerson->name))
+	if (scanf(" %s", newPerson->name) != 1)
 	{
 		printf("Scanf error");
 		exit(ERROR_SCANF);
 	}
 
 	printf("New person's surname: ");
-	if (!scanf(" %s", newPerson->surname))
+	if (scanf(" %s", newPerson->surname) != 1)
 	{
 		printf("Scanf error");
 		exit(ERROR_SCANF);
 	}
 
 	printf("New person's birth year: ");
-	if (!scanf(" %d", &newPerson->birthYear))
+	if (scanf(" %d", &newPerson->birthYear) != 1)
 	{
 		printf("Scanf error");
 		exit(ERROR_SCANF);
 	}
+
+	newPerson->next = NULL;
 
 	return newPerson;
 }
@@ -167,7 +176,8 @@ Position createPerson()
 int addToBeginning(Position head)
 {
 	Position newPerson = createPerson();
-	if (!newPerson) {
+	if (!newPerson) 
+	{
 		printf("Memory allocation error\n");
 		return ERROR_MALLOC;
 	}
@@ -178,14 +188,16 @@ int addToBeginning(Position head)
 
 int printList(Position current)
 {
-	if (current->next == NULL) {
+	if (current->next == NULL) 
+	{
 		printf("Linked list is empty!\n");
 		return ERROR_USER;
 	}
 
 	current = current->next;
 	printf("Name\tSurname\tBirth Year\n");
-	while (current != NULL) {
+	while (current != NULL) 
+	{
 		printf("%s\t%s\t%d\n", current->name, current->surname, current->birthYear);
 		current = current->next;
 	}
@@ -195,12 +207,14 @@ int printList(Position current)
 int addToEnd(Position currentPerson)
 {
 	Position newPerson = createPerson();
-	if (!newPerson) {
+	if (!newPerson) 
+	{
 		printf("Memory allocation error\n");
 		return ERROR_MALLOC;
 	}
 
-	while (currentPerson->next != NULL) {
+	while (currentPerson->next != NULL) 
+	{
 		currentPerson = currentPerson->next;
 	}
 
@@ -211,7 +225,8 @@ int addToEnd(Position currentPerson)
 
 Position findBySurname(Position current, char* surname)
 {
-	if (current->next == NULL) {
+	if (current->next == NULL) 
+	{
 		printf("Linked list is empty\n");
 		return NULL;
 	}
@@ -225,15 +240,14 @@ Position findBySurname(Position current, char* surname)
 			printf("Person with surname %s found!\n", current->next->surname);
 			return current->next;
 		}
-
 	}
 	printf("Person with surname %s not found!\n", surname);
 	return NULL;
 }
 
-Position findPreviousPersonBySurname(Position head, char* surname) {
+Position findPreviousPerson(Position head, Position person) 
+{
 	Position previousPerson = head;
-	Position person = findBySurname(head, surname);
 	while (previousPerson->next != NULL && previousPerson->next != person)
 		previousPerson = previousPerson->next;
 	return previousPerson;
@@ -244,7 +258,7 @@ int deletePerson(Position head, char* surname)
 	Position personToDelete = findBySurname(head, surname);
 	if (personToDelete == NULL) return ERROR_USER;
 
-	Position previousPerson = findPreviousPersonBySurname(head, surname);
+	Position previousPerson = findPreviousPerson(head, personToDelete);
 
 	previousPerson->next = personToDelete->next;
 	personToDelete->next = NULL;
@@ -253,12 +267,14 @@ int deletePerson(Position head, char* surname)
 	return EXIT_SUCCESS;
 }
 
-int addAfter(Position head, char *surname) {
+int addAfter(Position head, char *surname) 
+{
 	Position personToAddAfter = findBySurname(head, surname);
 	if (personToAddAfter == NULL) return ERROR_USER;
 
 	Position newPerson = createPerson();
-	if (!newPerson) {
+	if (!newPerson) 
+	{
 		printf("Memory allocation error\n");
 		return ERROR_MALLOC;
 	}
@@ -267,14 +283,17 @@ int addAfter(Position head, char *surname) {
 	personToAddAfter->next = newPerson;
 	return EXIT_SUCCESS;
 }
-int addBefore(Position head, char *surname) {
+
+int addBefore(Position head, char *surname) 
+{
 	Position personToAddBefore = findBySurname(head, surname);
 	if (personToAddBefore == NULL) return ERROR_USER;
 
-	Position previousPerson = findPreviousPersonBySurname(head, surname);
+	Position previousPerson = findPreviousPerson(head, personToAddBefore);
 
 	Position newPerson = createPerson();
-	if (!newPerson) {
+	if (!newPerson) 
+	{
 		printf("Memory allocation error\n");
 		return ERROR_MALLOC;
 	}
@@ -284,74 +303,98 @@ int addBefore(Position head, char *surname) {
 	return EXIT_SUCCESS;
 }
 
-int swapElements(Position head, Position element1, Position element2) {
-	Position previousPerson1 = findPreviousPersonBySurname(head, element1->surname);
-	Position previousPerson2 = findPreviousPersonBySurname(head, element2->surname);
-	Position nextPerson1 = element1->next;
-	Position nextPerson2 = element2->next;
-	previousPerson1->next = element2;
-	element2->next = nextPerson1;
-	previousPerson2->next = element1;
-	element1->next = nextPerson2;
+int swapElements(Position person1, Position person2) 
+{
+	Position temp = (Position)malloc(sizeof(Person));
+	if (!temp) 
+	{
+		printf("Memory allocation error!\n");
+		exit(ERROR_MALLOC);
+	}
+
+	strcpy(temp->name, person1->name);
+	strcpy(temp->surname, person1->surname);
+	temp->birthYear = person1->birthYear;
+	temp->next = NULL;
+
+	strcpy(person1->name, person2->name);
+	strcpy(person1->surname, person2->surname);
+	person1->birthYear = person2->birthYear;
+
+	strcpy(person2->name, temp->name);
+	strcpy(person2->surname, temp->surname);
+	person2->birthYear = temp->birthYear;
+
+	free(temp);
+	printf("Person with surname %s swapped with person with surname %s!\n", person1->surname, person2->surname);
 	return EXIT_SUCCESS;
 }
 
-int sortList(Position head) {
-	if (head->next == NULL) {
+int sortList(Position head) 
+{
+	if (head->next == NULL) 
+	{
 		printf("Linked list is empty!\n");
 		return ERROR_USER;
 	}
 
-	if (head->next->next == NULL) {
+	if (head->next->next == NULL) 
+	{
 		printf("Linked list has only one element!\n");
 		return ERROR_USER;
 	}
 
-	Position iElement = head->next, jElement = NULL;
-	int strcmpResult = 0, strcmpNameResult = 0;
+	Position iElement = NULL, jElement = NULL;
+	int strcmpResult = 0;
 	char iSurname[MAX_LENGTH] = "", jSurname[MAX_LENGTH] = "", iName[MAX_LENGTH] = "", jName[MAX_LENGTH] = "";
-	while (iElement != NULL) {
-		jElement = iElement->next;
-		while (jElement != NULL) {
+	for (iElement = head->next; iElement != NULL; iElement = iElement->next) 
+	{
+		for (jElement = iElement->next; jElement != NULL; jElement = jElement->next) 
+		{
 			strcpy(iSurname, iElement->surname);
 			strcpy(jSurname, jElement->surname);
 			_strupr(iSurname);
 			_strupr(jSurname);
 			strcmpResult = strcmp(iSurname, jSurname);
-			if (strcmpResult > 0) swapElements(head, iElement, jElement);
-			else if (strcmpResult == 0) {
+			if (strcmpResult > 0) swapElements(iElement, jElement);
+			else if (strcmpResult == 0) 
+			{
 				strcpy(iName, iElement->name);
 				strcpy(jName, jElement->name);
 				_strupr(iName);
 				_strupr(jName);
-				strcmpNameResult = strcmp(iName, jName);
-				if (strcmpNameResult > 0) swapElements(head, iElement, jElement);
-				else if (strcmpNameResult == 0) {
-					if (iElement->birthYear > jElement->birthYear) swapElements(head, iElement, jElement);
+				strcmpResult = strcmp(iName, jName);
+				if (strcmpResult > 0) swapElements(iElement, jElement);
+				else if (strcmpResult == 0) 
+				{
+					if (iElement->birthYear > jElement->birthYear) swapElements(iElement, jElement);
 				}
 			}
-			jElement = jElement->next;
 		}
-		iElement = iElement->next;
 	}
+	printf("List sorted!\n");
 	return EXIT_SUCCESS;
 }
 
-int writeListIntoFile(Position current) {
-	if (current->next == NULL) {
+int writeListIntoFile(Position current) 
+{
+	if (current->next == NULL) 
+	{
 		printf("Linked list is empty!\n");
 		return ERROR_USER;
 	}
 
 	FILE* file = fopen("Persons.txt", "w");
-	if (file == NULL) {
+	if (file == NULL) 
+	{
 		printf("File failed to open\n");
 		return ERROR_FILE;
 	}
 
-	fprintf(file ,"Name\tSurname\tBirth Year\n");
 	current = current->next;
-	while (current != NULL) {
+	fprintf(file, "Name\tSurname\tBirth Year\n");
+	while (current != NULL) 
+	{
 		fprintf(file, "%s\t%s\t%d\n", current->name, current->surname, current->birthYear);
 		current = current->next;
 	}
@@ -360,20 +403,25 @@ int writeListIntoFile(Position current) {
 	printf("List successfully written into a file!\n");
 	return EXIT_SUCCESS;
 }
-int readListFromFile(Position head) {
+
+int readListFromFile(Position head) 
+{
 	FILE* file = fopen("Persons.txt", "r");
-	if (file == NULL) {
+	if (file == NULL) 
+	{
 		printf("File failed to open\n");
 		return ERROR_FILE;
 	}
 
-	if (fgetc(file) == EOF) {
+	if (fgetc(file) == EOF) 
+	{
 		printf("File is empty!\n");
 		return ERROR_USER;
 	}
 
 	Position temporaryPerson = NULL;
-	while (head->next != NULL) {
+	while (head->next != NULL) 
+	{
 		temporaryPerson = head->next;
 		head->next = head->next->next;
 		free(temporaryPerson);
@@ -383,14 +431,17 @@ int readListFromFile(Position head) {
 
 	Position newPerson = NULL, previousPerson = head;
 	while (fgetc(file) != '\n') continue;
-	while (!feof(file)) {
+	while (!feof(file)) 
+	{
 		newPerson = (Position)malloc(sizeof(Person));
-		if (!newPerson) {
+		if (!newPerson) 
+		{
 			printf("Memory allocation error");
 			exit(ERROR_MALLOC);
 		}
 
-		if (!fscanf(file, " %s %s %d ", newPerson->name, newPerson->surname, &newPerson->birthYear)) {
+		if (!fscanf(file, " %s %s %d ", newPerson->name, newPerson->surname, &newPerson->birthYear)) 
+		{
 			printf("Fscanf error!\n");
 			fclose(file);
 			return ERROR_FSCANF;
