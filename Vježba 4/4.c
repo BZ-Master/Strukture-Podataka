@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define MAX_LENGTH 50
 #define EXIT_SUCCESS 0
 #define FILE_ERROR -1
 #define FSCANF_ERROR -2
