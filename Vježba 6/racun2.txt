@@ -1,3 +1,5 @@
 2024-05-15
 keksi 1 1.90
 dinja 3 3.00
+krumpir 1 1.90
+pivo 6 4.99

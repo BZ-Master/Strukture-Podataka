@@ -9,6 +9,7 @@
 #define FSCANF_ERROR -2
 #define MALLOC_ERROR -3
 #define SCANF_ERROR -4
+#define SSCANF_ERROR -5
 
 typedef struct _Date{
 	int year;
@@ -130,8 +131,8 @@ int readFile(char* fileName, Position head) {
 	}
 
 	if (sscanf(dateString, "%d-%d-%d", &newReceipt->date.year, &newReceipt->date.month, &newReceipt->date.day) != 3) {
-		printf("fscanf error!\n");
-		return FSCANF_ERROR;
+		printf("sscanf error!\n");
+		return SSCANF_ERROR;
 	}
 
 	newReceipt->item.name[0] = '\0';
@@ -198,14 +199,13 @@ int freeReceipts(Position head) {
 	Position current = head->next;
 	Position receiptToFree = NULL;
 	List headItem = NULL;
-	List itemToFree = NULL;
 	while (current != NULL) {
 		headItem = &current->item;
+		List itemToFree = headItem->next;
 		while (itemToFree != NULL) {
-			itemToFree = &current->item.next;
 			headItem->next = itemToFree->next;
-			itemToFree->next = NULL;
 			free(itemToFree);
+			itemToFree = headItem->next;
 		}
 		receiptToFree = current;
 		previous->next = current->next;
@@ -225,22 +225,41 @@ int inquiry(Position head) {
 	{
 		printf("scanf error!\n");
 		return SCANF_ERROR;
-	};
-	printf("Enter start date in format YYYY-MM-DD: ");
-	if (scanf("%d-%d-%d", &start.year, &start.month, &start.day) != 3) 
+	}
+	_strlwr(item);
+
+	printf("Enter start date in format DD.MM.YYYY.: ");
+	if (scanf("%d.%d.%d.", &start.day, &start.month, &start.year) != 3) 
 	{
 		printf("scanf error!\n");
 		return SCANF_ERROR;
-	};
-	printf("Enter end date in format YYYY-MM-DD: ");
-	if (scanf("%d-%d-%d", &end.year, &end.month, &end.day) != 3) 
+	}
+	printf("Enter end date in format DD.MM.YYYY.: ");
+	if (scanf("%d.%d.%d.", &end.day, &end.month, &end.year) != 3) 
 	{
 		printf("scanf error!\n");
 		return SCANF_ERROR;
-	};
-	Position current = head->next;
+	}
+
 	float totalPrice = 0.0;
 	int totalAmount = 0;
+	Position currentReceipt = head->next;
+	char receiptItem[MAX_CHAR_LENGTH] = "";
+	while (currentReceipt != NULL) {
+		if (isDateLater(currentReceipt->date, start) && isDateLater(end, currentReceipt->date)) {
+			List currentItem = currentReceipt->item.next;
+			while (currentItem != NULL) {
+				strcpy(receiptItem, currentItem->name);
+				_strlwr(receiptItem);
+				if (strcmp(receiptItem, item) == 0) {
+					totalAmount += currentItem->amount;
+					totalPrice += currentItem->price;
+				}
+				currentItem = currentItem->next;
+			}
+		}
+		currentReceipt = currentReceipt->next;
+	}
 	printf("\nInquiry Result:\nItem: %s\nTotal amount: %d\nTotal spent: %.2f\n", item, totalAmount, totalPrice);
 	return EXIT_SUCCESS;
 }
