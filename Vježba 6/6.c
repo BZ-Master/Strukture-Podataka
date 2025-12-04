@@ -104,7 +104,7 @@ int sortReceipt(Position newReceipt, Position head) {
 	Position previous = head;
 	while (current != NULL) {
 		if (isDateLater(current->date, newReceipt->date) && isDateLater(newReceipt->date, previous->date)) break;
-		else current = current->next; previous = previous->next;
+		else { current = current->next; previous = previous->next; }
 	}
 	newReceipt->next = current;
 	previous->next = newReceipt;
