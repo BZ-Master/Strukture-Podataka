@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #define MAX_CHAR_LENGTH 50
+#define DIRECTORY_NOT_FOUND 2
 #define NULL_DIRECTORY_ERROR 1
 #define EXIT_SUCCESS 0
 #define MALLOC_ERROR -1
@@ -53,21 +54,22 @@ int main() {
 	int cmd = 0;
 	char newDirName[MAX_CHAR_LENGTH] = "";
 	directoryPosition currentDirectory = root;
+	stackPosition stackItem = NULL;
 	printf("1 - md\n2 - cd\n3 - cd..\n4 - dir\n5 - exit\n");
 	do {
+		printf("Enter command number 1-5: ");
 		if (scanf("%d", &cmd) != 1) {
 			printf("scanf error!\n");
-			freeDirectories(&headDirectory);
+			freeDirectories(root);
 			freeStack(&headStack);
 			return SCANF_ERROR;
 		}
-
 		switch (cmd) {
 			case 1:
 				printf("md ");
 				if (scanf("%s", newDirName) != 1) {
 					printf("scanf error!\n");
-					freeDirectories(&headDirectory);
+					freeDirectories(root);
 					freeStack(&headStack);
 					return SCANF_ERROR;
 				}
@@ -77,12 +79,12 @@ int main() {
 				printf("cd ");
 				if (scanf("%s", newDirName) != 1) {
 					printf("scanf error!\n");
-					freeDirectories(&headDirectory);
+					freeDirectories(root);
 					freeStack(&headStack);
 					return SCANF_ERROR;
 				}
 				changeDirectory(newDirName, currentDirectory, &headStack);
-				stackPosition stackItem = &headStack;
+				stackItem = &headStack;
 				while (stackItem->next != NULL) stackItem = stackItem->next;
 				currentDirectory = stackItem->level;
 				printf("Current directory: ");
@@ -90,6 +92,16 @@ int main() {
 				break;
 			case 3:
 				printf("cd..\n");
+				if (strcmp(currentDirectory->name, "C:") == 0) {
+					printf("Can not go back! Already at root!\n");
+					break;
+				}
+				pop(&headStack);
+				stackItem = &headStack;
+				while (stackItem->next != NULL) stackItem = stackItem->next;
+				currentDirectory = stackItem->level;
+				printf("Current directory: ");
+				printDirectoryPath(&headStack);
 				break;
 			case 4:
 				printf("dir\n");
@@ -176,7 +188,7 @@ int changeDirectory(char* name, directoryPosition currentDirectory, stackPositio
 		current = current->nextSibling;
 	}
 	printf("Directory not found!\n");
-	return EXIT_SUCCESS;
+	return DIRECTORY_NOT_FOUND;
 }
 
 int printDirectory(directoryPosition currentDirectory) {
@@ -186,7 +198,7 @@ int printDirectory(directoryPosition currentDirectory) {
 	}
 	directoryPosition current = currentDirectory->firstChild;
 	while (current != NULL) {
-		printf("%s ", current->name);
+		printf("%s   ", current->name);
 		current = current->nextSibling;
 	}
 	printf("\n");
