@@ -1,0 +1,5 @@
+012	Programiranje	6
+102	Matematika_1	5
+078	Elektrotehnika	7
+103	Matematika_2	5
+001	Baze_Podataka	4

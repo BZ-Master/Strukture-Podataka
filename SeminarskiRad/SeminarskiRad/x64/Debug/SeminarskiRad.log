@@ -1,0 +1,6 @@
+﻿  source.c
+C:\Users\Bartul\Desktop\Faks\3. semestar\Strukture podataka\SeminarskiRad\source.c(224,10): warning C4477: 'printf' : format string '%n' requires an argument of type 'int *', but variadic argument 2 has type 'char *'
+      C:\Users\Bartul\Desktop\Faks\3. semestar\Strukture podataka\SeminarskiRad\source.c(224,10):
+      consider using '%hhn' in the format string
+  
+  SeminarskiRad.vcxproj -> C:\Users\Bartul\Desktop\Faks\3. semestar\Strukture podataka\SeminarskiRad\x64\Debug\SeminarskiRad.exe
