@@ -132,6 +132,8 @@
   <ItemGroup>
     <Text Include="aantic.txt" />
     <Text Include="courses.txt" />
+    <Text Include="jjuric.txt" />
+    <Text Include="llanic.txt" />
     <Text Include="students.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

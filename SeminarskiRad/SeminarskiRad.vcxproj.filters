@@ -23,5 +23,7 @@
     <Text Include="students.txt" />
     <Text Include="courses.txt" />
     <Text Include="aantic.txt" />
+    <Text Include="jjuric.txt" />
+    <Text Include="llanic.txt" />
   </ItemGroup>
 </Project>

@@ -4,6 +4,7 @@
 #include <string.h>
 #include <malloc.h>
 #define MAX_CHAR_LENGTH 50
+#define HASH_FULL 1
 #define EXIT_SUCCESS 0
 #define MALLOC_ERROR -1
 #define FILE_ERROR -2
@@ -56,30 +57,38 @@ typedef struct _studentStack {
 } studentStack;
 
 courseHashTable initializeHash(int);
+coursePosition findInHash(int, courseHashTable);
 int addToHash(int, char*, int, courseHashTable);
-int deleteHash();
-//citanje
-int readStudentFile(char *);
-int readMainFile();
+int addToList(char*, char*, int, studentPosition);
+int readStudentFile(char *, studentPosition, courseHashTable);
+int readMainFile(studentPosition, courseHashTable);
 int readCourseFile(courseHashTable);
-//sortiranje studenata
 int sortAlphabetically();
 int sortByAverageGrade();
-//ISPIS
-int printAscending(studentPosition); //red
-int printDescending(studentPosition, studentStackPosition); //stog
+int printAscending(studentPosition);
+int printDescending(studentPosition, studentStackPosition);
 int printStudent(studentPosition); //printa name surname birthyear coursesstatus ects(polozeno/ukupno) averagegrade
+int printCourses(courseHashTable);
 int printCourse(courseHashTable); //printa id name ects i popis studenata
-int printStudentListToFile(); //ispisuje listu studenata u txt file
-//dodavanje
-int addCourse(); //dodaje kolegij i ispisuje ga u courses.txt
+int writeStudents(); //ispisuje listu studenata u txt file
+int writeCourse(int, char*, int);
+int addCourse(courseHashTable); //dodaje kolegij i ispisuje ga u courses.txt
 int addStudent(); //dodaje studenta i njegove kolegije i ispisuje podatke u students.txt i ispisuje kolegije u studentovu datoteku
-int deleteStudent(); 
+int deleteStudent();
+int deleteHash();
 
 int main() {
+	student head = { "", "", 0, 0.0, 0, 0, NULL, NULL };
+	studentStack stackHead = { NULL,NULL };
 	courseHashTable hashTable = initializeHash(103);
 	readCourseFile(hashTable);
-	printCourse(hashTable);
+	printCourses(hashTable);
+	readMainFile(&head, hashTable);
+	printAscending(&head);
+	printf("\n");
+	printDescending(&head, &stackHead);
+	//addCourse(hashTable);
+	//printCourses(hashTable);
 	return EXIT_SUCCESS;
 }
 
@@ -102,6 +111,40 @@ courseHashTable initializeHash(int hashSize) {
 	return hashTable;
 }
 
+coursePosition findInHash(int key, courseHashTable hashTable) {
+	coursePosition current = hashTable->hash[key % hashTable->size];
+	if (current == NULL || key != current->id) {
+		return NULL;
+	}
+	return current;
+}
+
+int addToList(char* surname, char* name, int year, studentPosition lastEl) {
+	studentPosition newEl = (studentPosition)malloc(sizeof(student));
+	if (newEl == NULL) {
+		printf("malloc error while allocating memory for new student!\n");
+		return MALLOC_ERROR;
+	}
+
+	strcpy(newEl->name, name);
+	strcpy(newEl->surname, surname);
+	newEl->birthYear = year;
+	newEl->averageGrade = 0.0;
+	newEl->currentEcts = 0;
+	newEl->totalEcts = 0;
+	newEl->courses = (courseStatusPosition)malloc(sizeof(courseStatus));
+	if (newEl->courses == NULL) {
+		printf("malloc error while allocating memory for course status head!\n");
+		return MALLOC_ERROR;
+	}
+	newEl->courses->course = NULL;
+	newEl->courses->grade = 0;
+	newEl->courses->next = NULL;
+	newEl->next = NULL;
+	lastEl->next = newEl;
+	return EXIT_SUCCESS;
+}
+
 int addToHash(int key, char* name, int ects, courseHashTable hashTable) {
 	coursePosition newNode = (coursePosition)malloc(sizeof(courseNode));
 	if (newNode == NULL) {
@@ -116,22 +159,66 @@ int addToHash(int key, char* name, int ects, courseHashTable hashTable) {
 	return EXIT_SUCCESS;
 }
 
-int readStudentFile(char* fileName) {
+int readStudentFile(char* fileName, studentPosition student, courseHashTable hashTable) {
 	FILE* studentFile = fopen(fileName, "r");
 	if (!studentFile) {
 		printf("Error while openning student file!\n");
 		return FILE_ERROR;
 	}
+
+	int id = 0, grade = 0;
+	courseStatusPosition current = student->courses;
+	while (!feof(studentFile)) {
+		if (fscanf(studentFile, "%d %d", &id, &grade) != 2) {
+			printf("fscanf error while reading student's file!\n");
+			return FSCANF_ERROR;
+		}
+		coursePosition course = findInHash(id, hashTable);
+		if (course == NULL) {
+			printf("Course with ID %d not found!\n", id);
+			continue;
+		}
+		courseStatusPosition newCourseStatus = (courseStatusPosition)malloc(sizeof(courseStatus));
+		if (newCourseStatus == NULL) {
+			printf("malloc error while allocating memory for course status!\n");
+			return MALLOC_ERROR;
+		}
+		newCourseStatus->grade = grade;
+		newCourseStatus->course = course;
+		newCourseStatus->next = NULL;
+		current->next = newCourseStatus;
+		current = current->next;
+	}
+
 	fclose(studentFile);
 	return EXIT_SUCCESS;
 }
 
-int readMainFile() {
+int readMainFile(studentPosition head, courseHashTable hashTable) {
 	FILE* file = fopen("students.txt", "r");
 	if (!file) {
 		printf("Error while openning main student file!\n");
 		return FILE_ERROR;
 	}
+	char name[MAX_CHAR_LENGTH] = "";
+	char surname[MAX_CHAR_LENGTH] = "";
+	int year = 0;
+	char fileName[MAX_CHAR_LENGTH] = "";
+
+	studentPosition current = head;
+	while (current->next != NULL) current = current->next;
+
+	while (!feof(file)) {
+		if (fscanf(file, "%s %s %d %s", surname, name, &year, fileName) != 4) {
+			printf("fscanf error while reading courses!\n");
+			return FSCANF_ERROR;
+		}
+		if (addToList(surname, name, year, current) == EXIT_SUCCESS) {
+			current = current->next;
+			readStudentFile(fileName, current, hashTable);
+		}
+	}
+
 	fclose(file);
 	return EXIT_SUCCESS;
 }
@@ -186,6 +273,7 @@ int printDescending(studentPosition head, studentStackPosition stackHead) {
 		newElement->student = current;
 		newElement->next = stackHead->next;
 		stackHead->next = newElement;
+		current = current->next;
 	}
 	studentStackPosition currentStackEl = stackHead->next;
 	printf("Surname\tName\tBirth Year\tAverage grade\tECTS\n");
@@ -199,6 +287,10 @@ int printDescending(studentPosition head, studentStackPosition stackHead) {
 }
 
 int printCourse(courseHashTable hashTable) {
+	return EXIT_SUCCESS;
+}
+
+int printCourses(courseHashTable hashTable) {
 	int i = 0;
 	for (i = 0; i < hashTable->size; i++) {
 		coursePosition current = hashTable->hash[i];
@@ -221,18 +313,56 @@ int printStudent(studentPosition student) {
 	courseStatusPosition current = student->courses->next;
 	printf("COURSES STATUS:\nID\tName\tGrade\n");
 	while (current != NULL) {
-		printf("%d\t%n\t%d\n", current->course->id, current->course->name, current->grade);
+		printf("%d\t%s\t%d\n", current->course->id, current->course->name, current->grade);
 		current = current->next;
 	}
 	return EXIT_SUCCESS;
 }
-int addCourse() {
+
+int writeCourse(int id, char* name, int ects) {
+	FILE* file = fopen("courses.txt", "a");
+	if (!file) {
+		printf("Error while openning courses file!\n");
+		return FILE_ERROR;
+	}
+	fprintf(file, "\n%3d\t%s\t%d", id, name, ects);
+	fclose(file);
+	return EXIT_SUCCESS;
+}
+
+int addCourse(courseHashTable hashTable) {
+	int id = 0, ects = 0;
+	char s[MAX_CHAR_LENGTH] = "";
+
+	printf("Unesite ime kolegija: ");
+	if (scanf("%s", s) != 1) {
+		printf("scanf error!");
+		return SCANF_ERROR;
+	}
+
+	printf("Unesite broj ECTS bodova koji nosi kolegij: ");
+	if (scanf("%d", &ects) != 1) {
+		printf("scanf error!");
+		return SCANF_ERROR;
+	}
+
+	while (id < hashTable->size) {
+		if (hashTable->hash[id % hashTable->size] == NULL) {
+			addToHash(id, s, ects, hashTable);
+			writeCourse(id, s, ects);
+			return EXIT_SUCCESS;
+		}
+		id++;
+	}
+
+	printf("No free ID found / Hash table full!");
+	return HASH_FULL;
+}
+
+int writeStudents() {
 	return EXIT_SUCCESS;
 }
 int addStudent() {
-	return EXIT_SUCCESS;
-}
-int printStudentListToFile() {
 	return EXIT_SUCCESS;
 }
 int deleteStudent() {
