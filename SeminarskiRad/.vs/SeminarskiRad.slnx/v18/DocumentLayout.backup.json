@@ -11,16 +11,16 @@
       "RelativeMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|solutionrelative:courses.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\jjuric.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|solutionrelative:jjuric.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\aantic.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|solutionrelative:aantic.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\llanic.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|solutionrelative:llanic.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\aantic.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|solutionrelative:aantic.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\jjuric.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|solutionrelative:jjuric.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\students.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
@@ -44,7 +44,7 @@
               "RelativeDocumentMoniker": "source.c",
               "ToolTip": "C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\source.c",
               "RelativeToolTip": "source.c",
-              "ViewState": "AgIAAEIAAAAAAAAAAAAAABMBAAAaAAAAAAAAAA==",
+              "ViewState": "AgIAAIkBAAAAAAAAAAAAAJgBAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
               "WhenOpened": "2026-01-03T13:06:16.17Z",
               "IsPinned": true,
@@ -80,7 +80,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "aantic.txt",
               "DocumentMoniker": "C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\aantic.txt",
               "RelativeDocumentMoniker": "aantic.txt",
@@ -108,7 +108,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "jjuric.txt",
               "DocumentMoniker": "C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\jjuric.txt",
               "RelativeDocumentMoniker": "jjuric.txt",

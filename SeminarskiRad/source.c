@@ -67,28 +67,37 @@ int sortAlphabetically();
 int sortByAverageGrade();
 int printAscending(studentPosition);
 int printDescending(studentPosition, studentStackPosition);
-int printStudent(studentPosition); //printa name surname birthyear coursesstatus ects(polozeno/ukupno) averagegrade
-int printCourses(courseHashTable);
-int printCourse(courseHashTable); //printa id name ects i popis studenata
-int writeStudents(); //ispisuje listu studenata u txt file
+int printStudent(studentPosition);
+int printCourses(courseHashTable, studentPosition);
+int printCourse(coursePosition, studentPosition);
+int writeStudents(coursePosition, studentPosition);
 int writeCourse(int, char*, int);
-int addCourse(courseHashTable); //dodaje kolegij i ispisuje ga u courses.txt
+int addCourse(courseHashTable);
 int addStudent(); //dodaje studenta i njegove kolegije i ispisuje podatke u students.txt i ispisuje kolegije u studentovu datoteku
 int deleteStudent();
 int deleteHash();
 
 int main() {
 	student head = { "", "", 0, 0.0, 0, 0, NULL, NULL };
-	studentStack stackHead = { NULL,NULL };
+	studentStack stackHead = { NULL, NULL };
 	courseHashTable hashTable = initializeHash(103);
 	readCourseFile(hashTable);
-	printCourses(hashTable);
 	readMainFile(&head, hashTable);
-	printAscending(&head);
 	printf("\n");
-	printDescending(&head, &stackHead);
+	//printAscending(&head);
+	//printf("\n");
+	//printDescending(&head, &stackHead);
+	//printf("\n");
+	//studentPosition current = &head;
+	//current = current->next;
+	//while (current != NULL) {
+	//	printStudent(current);
+	//	printf("\n");
+	//	current = current->next;
+	//}
 	//addCourse(hashTable);
-	//printCourses(hashTable);
+	/*printCourses(hashTable, &head);*/
+	//writeStudents(hashTable->hash[12%103], &head);
 	return EXIT_SUCCESS;
 }
 
@@ -167,6 +176,7 @@ int readStudentFile(char* fileName, studentPosition student, courseHashTable has
 	}
 
 	int id = 0, grade = 0;
+	int totalECTS = 0, currentECTS = 0, gradeSum = 0, num = 0;
 	courseStatusPosition current = student->courses;
 	while (!feof(studentFile)) {
 		if (fscanf(studentFile, "%d %d", &id, &grade) != 2) {
@@ -188,7 +198,16 @@ int readStudentFile(char* fileName, studentPosition student, courseHashTable has
 		newCourseStatus->next = NULL;
 		current->next = newCourseStatus;
 		current = current->next;
+
+		gradeSum += grade;
+		num++;
+		totalECTS += current->course->ects;
+		if (grade > 1) currentECTS += current->course->ects;
 	}
+
+	student->averageGrade = (float)gradeSum / num;
+	student->totalEcts = totalECTS;
+	student->currentEcts = currentECTS;
 
 	fclose(studentFile);
 	return EXIT_SUCCESS;
@@ -234,7 +253,7 @@ int readCourseFile(courseHashTable hashTable) {
 	char name[MAX_CHAR_LENGTH] = "";
 	int ects = 0;
 	while (!feof(file)) {
-		if (fscanf(file, "%d %49s %d", &id, name, &ects) != 3) {
+		if (fscanf(file, "%d %s %d", &id, name, &ects) != 3) {
 			printf("fscanf error!\n");
 			return FSCANF_ERROR;
 		}
@@ -254,9 +273,9 @@ int sortByAverageGrade() {
 
 int printAscending(studentPosition head) {
 	studentPosition current = head->next;
-	printf("Surname\tName\tBirth Year\tAverage grade\tECTS\n");
+	printf("Surname\tName\tBirth Year\tAverage Grade\tECTS\n");
 	while (current != NULL) {
-		printf("%s\t%s\t%d\t%f\t%d/%d\n", current->surname, current->name, current->birthYear, current->averageGrade, current->currentEcts, current->totalEcts);
+		printf("%s\t%s\t%d\t\t%.2f\t\t%d/%d\n", current->surname, current->name, current->birthYear, current->averageGrade, current->currentEcts, current->totalEcts);
 		current = current->next;
 	}
 	return EXIT_SUCCESS;
@@ -276,26 +295,46 @@ int printDescending(studentPosition head, studentStackPosition stackHead) {
 		current = current->next;
 	}
 	studentStackPosition currentStackEl = stackHead->next;
-	printf("Surname\tName\tBirth Year\tAverage grade\tECTS\n");
+	printf("Surname\tName\tBirth Year\tAverage Grade\tECTS\n");
 	while (currentStackEl != NULL) {
-		printf("%s\t%s\t%d\t%f\t%d/%d\n", currentStackEl->student->surname, currentStackEl->student->name, currentStackEl->student->birthYear, currentStackEl->student->averageGrade, currentStackEl->student->currentEcts, currentStackEl->student->totalEcts);
+		printf("%s\t%s\t%d\t\t%.2f\t\t%d/%d\n", currentStackEl->student->surname, currentStackEl->student->name, currentStackEl->student->birthYear, currentStackEl->student->averageGrade, currentStackEl->student->currentEcts, currentStackEl->student->totalEcts);
 		stackHead->next = currentStackEl->next;
+		currentStackEl->student = NULL;
 		free(currentStackEl);
 		currentStackEl = stackHead->next;
 	}
 	return EXIT_SUCCESS;
 }
 
-int printCourse(courseHashTable hashTable) {
+int printCourse(coursePosition hashEl, studentPosition head) {
+	printf("COURSE INFO\n-----------------------------------------------------\n");
+	printf("Course ID: %3d\n", hashEl->id);
+	printf("Course name: %s\n", hashEl->name);
+	printf("ECTS: %d\n", hashEl->ects);
+	printf("STUDENTS ENROLLED:\nName\tSurname\tBirth Year\tGrade\n");
+	studentPosition current = head->next;
+	while (current != NULL) {
+		courseStatusPosition currentCourse = current->courses->next;
+		while (currentCourse != NULL) {
+			if (currentCourse->course == hashEl) {
+				printf("%s\t%s\t%d\t\t%d\n", current->name, current->surname, current->birthYear, currentCourse->grade);
+				break;
+			}
+			currentCourse = currentCourse->next;
+		}
+		current = current->next;
+	}
+	printf("\n");
 	return EXIT_SUCCESS;
 }
 
-int printCourses(courseHashTable hashTable) {
+int printCourses(courseHashTable hashTable, studentPosition head) {
 	int i = 0;
 	for (i = 0; i < hashTable->size; i++) {
 		coursePosition current = hashTable->hash[i];
 		while (current != NULL) {
-			printf("%3d\t%s\t%d\n", hashTable->hash[i]->id, hashTable->hash[i]->name, hashTable->hash[i]->ects);
+			//printf("%3d\t%s\t%d\n", hashTable->hash[i]->id, hashTable->hash[i]->name, hashTable->hash[i]->ects);
+			printCourse(current, head);
 			current = current->next;
 		}
 	}
@@ -303,17 +342,17 @@ int printCourses(courseHashTable hashTable) {
 }
 
 int printStudent(studentPosition student) {
-	printf("STUDENT CARD\n-----------------------------------------------\n");
+	printf("STUDENT CARD\n-----------------------------------------------------\n");
 	printf("Name: %s\n", student->name);
 	printf("Surname: %s\n", student->surname);
 	printf("Birth Year: %d\n", student->birthYear);
 	printf("Current ECTS: %d\n", student->currentEcts);
 	printf("Total ECTS: %d\n", student->totalEcts);
-	printf("Average grade: %f\n", student->averageGrade);
+	printf("Average grade: %.2f\n", student->averageGrade);
 	courseStatusPosition current = student->courses->next;
-	printf("COURSES STATUS:\nID\tName\tGrade\n");
+	printf("COURSES STATUS:\nID\tName\t\tGrade\n");
 	while (current != NULL) {
-		printf("%d\t%s\t%d\n", current->course->id, current->course->name, current->grade);
+		printf("%3d\t%s\t%d\n", current->course->id, current->course->name, current->grade);
 		current = current->next;
 	}
 	return EXIT_SUCCESS;
@@ -359,9 +398,38 @@ int addCourse(courseHashTable hashTable) {
 	return HASH_FULL;
 }
 
-int writeStudents() {
+int writeStudents(coursePosition course, studentPosition head) {
+	char fileName[MAX_CHAR_LENGTH - 4] = "";
+	printf("Name the file to store student list: ");
+	if (scanf("%s", fileName) != 1) {
+		printf("scanf error!\n");
+		return SCANF_ERROR;
+	}
+	strncat(fileName, ".txt", 4);
+	FILE* file = fopen(fileName, "w");
+	if (!file) {
+		printf("Error while openning courses file!\n");
+		return FILE_ERROR;
+	}
+
+	studentPosition current = head->next;
+	while (current != NULL) {
+		courseStatusPosition currentCourse = current->courses->next;
+		while (currentCourse != NULL) {
+			if (currentCourse->course == course) {
+				fprintf(file, "%s\t%s\t%d\t\t%d\n", current->name, current->surname, current->birthYear, currentCourse->grade);
+				break;
+			}
+			currentCourse = currentCourse->next;
+		}
+		current = current->next;
+	}
+	printf("\n");
+
+	fclose(file);
 	return EXIT_SUCCESS;
 }
+
 int addStudent() {
 	return EXIT_SUCCESS;
 }
