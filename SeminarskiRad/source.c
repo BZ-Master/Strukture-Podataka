@@ -399,9 +399,9 @@ int addCourse(courseHashTable hashTable) {
 }
 
 int writeStudents(coursePosition course, studentPosition head) {
-	char fileName[MAX_CHAR_LENGTH - 4] = "";
+	char fileName[MAX_CHAR_LENGTH] = "";
 	printf("Name the file to store student list: ");
-	if (scanf("%s", fileName) != 1) {
+	if (scanf("%45s", fileName) != 1) {
 		printf("scanf error!\n");
 		return SCANF_ERROR;
 	}
