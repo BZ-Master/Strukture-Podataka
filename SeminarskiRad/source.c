@@ -4,12 +4,13 @@
 #include <string.h>
 #include <malloc.h>
 #define MAX_CHAR_LENGTH 50
-#define HASH_FULL 1
 #define EXIT_SUCCESS 0
 #define MALLOC_ERROR -1
 #define FILE_ERROR -2
 #define SCANF_ERROR -3
 #define FSCANF_ERROR -4
+#define HASH_FULL -5
+#define NULL_PTR_ERROR -6
 
 struct _courseNode;
 typedef struct _courseNode* coursePosition;
@@ -58,6 +59,7 @@ typedef struct _studentStack {
 
 courseHashTable initializeHash(int);
 coursePosition findInHash(int, courseHashTable);
+studentPosition findPreviousInList(studentPosition, studentPosition);
 int addToHash(int, char*, int, courseHashTable);
 int addToList(char*, char*, int, studentPosition);
 int readStudentFile(char *, studentPosition, courseHashTable);
@@ -70,12 +72,15 @@ int printDescending(studentPosition, studentStackPosition);
 int printStudent(studentPosition);
 int printCourses(courseHashTable, studentPosition);
 int printCourse(coursePosition, studentPosition);
+int writeStudent(studentPosition, char*);
 int writeStudents(coursePosition, studentPosition);
+int writeStudentCourses(studentPosition, char*);
 int writeCourse(int, char*, int);
 int addCourse(courseHashTable);
-int addStudent(); //dodaje studenta i njegove kolegije i ispisuje podatke u students.txt i ispisuje kolegije u studentovu datoteku
-int deleteStudent();
-int deleteHash();
+int addStudent(studentPosition, courseHashTable);
+int freeStudentCourseStatus(studentPosition);
+int freeStudent(studentPosition, studentPosition);
+int freeAllStudents(studentPosition);
 
 int main() {
 	student head = { "", "", 0, 0.0, 0, 0, NULL, NULL };
@@ -98,6 +103,9 @@ int main() {
 	//addCourse(hashTable);
 	/*printCourses(hashTable, &head);*/
 	//writeStudents(hashTable->hash[12%103], &head);
+	//addStudent(&head, hashTable);
+	free(hashTable);
+	freeAllStudents(&head);
 	return EXIT_SUCCESS;
 }
 
@@ -144,6 +152,7 @@ int addToList(char* surname, char* name, int year, studentPosition lastEl) {
 	newEl->courses = (courseStatusPosition)malloc(sizeof(courseStatus));
 	if (newEl->courses == NULL) {
 		printf("malloc error while allocating memory for course status head!\n");
+		free(newEl);
 		return MALLOC_ERROR;
 	}
 	newEl->courses->course = NULL;
@@ -254,7 +263,7 @@ int readCourseFile(courseHashTable hashTable) {
 	int ects = 0;
 	while (!feof(file)) {
 		if (fscanf(file, "%d %s %d", &id, name, &ects) != 3) {
-			printf("fscanf error!\n");
+			printf("fscanf error while reading course file!\n");
 			return FSCANF_ERROR;
 		}
 		addToHash(id, name, ects, hashTable);
@@ -373,15 +382,15 @@ int addCourse(courseHashTable hashTable) {
 	int id = 0, ects = 0;
 	char s[MAX_CHAR_LENGTH] = "";
 
-	printf("Unesite ime kolegija: ");
+	printf("Enter course name: ");
 	if (scanf("%s", s) != 1) {
-		printf("scanf error!");
+		printf("scanf error!\n");
 		return SCANF_ERROR;
 	}
 
-	printf("Unesite broj ECTS bodova koji nosi kolegij: ");
+	printf("Enter the number of ECTS: ");
 	if (scanf("%d", &ects) != 1) {
-		printf("scanf error!");
+		printf("scanf error!\n");
 		return SCANF_ERROR;
 	}
 
@@ -394,14 +403,14 @@ int addCourse(courseHashTable hashTable) {
 		id++;
 	}
 
-	printf("No free ID found / Hash table full!");
+	printf("No free ID found / Hash table full!\n");
 	return HASH_FULL;
 }
 
 int writeStudents(coursePosition course, studentPosition head) {
-	char fileName[MAX_CHAR_LENGTH - 4] = "";
-	printf("Name the file to store student list: ");
-	if (scanf("%s", fileName) != 1) {
+	char fileName[MAX_CHAR_LENGTH] = "";
+	printf("Name the file to store student list (without .txt): ");
+	if (scanf("%45s", fileName) != 1) {
 		printf("scanf error!\n");
 		return SCANF_ERROR;
 	}
@@ -430,12 +439,150 @@ int writeStudents(coursePosition course, studentPosition head) {
 	return EXIT_SUCCESS;
 }
 
-int addStudent() {
+int writeStudent(studentPosition newStudent, char *fileName) {
+	FILE* file = fopen("students.txt", "a");
+	if (!file) {
+		printf("Error while openning main student file!\n");
+		return FILE_ERROR;
+	}
+
+	fprintf(file, "\n%s\t%s\t%d\t%s", newStudent->surname, newStudent->name, newStudent->birthYear, fileName);
+
+	fclose(file);
 	return EXIT_SUCCESS;
 }
-int deleteStudent() {
+
+int writeStudentCourses(studentPosition student, char* fileName) {
+	FILE* file = fopen(fileName, "w");
+	if (!file) {
+		printf("Error while openning courses file!\n");
+		return FILE_ERROR;
+	}
+
+	courseStatusPosition current = student->courses->next;
+	while (current != NULL) {
+		fprintf(file, "\n%d\t%d", current->course->id, current->grade);
+		current = current->next;
+	}
+
+	fclose(file);
 	return EXIT_SUCCESS;
 }
-int deleteHash() {
+
+int addStudent(studentPosition head, courseHashTable hashTable) {
+	char name[MAX_CHAR_LENGTH] = "";
+	char surname[MAX_CHAR_LENGTH] ="";
+	int birthYear = 0;
+
+	printf("Enter name surname and birth year (example: John Doe 1999): ");
+	if (scanf("%s %s %d", name, surname, &birthYear) != 3) {
+		printf("scanf error!\n");
+		return SCANF_ERROR;
+	}
+
+	studentPosition lastEl = head;
+	while (lastEl->next != NULL) lastEl = lastEl->next;
+
+	if(addToList(surname, name, birthYear, lastEl) != EXIT_SUCCESS) return MALLOC_ERROR;
+	
+	studentPosition currentStudent = lastEl->next;
+	courseStatusPosition current = currentStudent->courses;
+	int choice = 0, grade = 0;
+	int totalECTS = 0, currentECTS = 0, gradeSum = 0, num = 0;
+	printf("Enter courses info:\n");
+	do {
+		printf("Enter course ID (enter any negative number to end course inputing): ");
+		if (scanf("%d", &choice) != 1) {
+			printf("scanf error\n!");
+			return SCANF_ERROR;
+		}
+
+		if (choice < 0) break;
+
+		coursePosition course = findInHash(choice, hashTable);
+		if (course == NULL) { 
+			printf("Course does not exist! Try again!\n");
+			continue;
+		}
+		else {
+			printf("Enter course grade: ");
+			if (scanf("%d", &grade) != 1) {
+				printf("scanf error\n!");
+				return SCANF_ERROR;
+			}
+			courseStatusPosition newCourseStatus = (courseStatusPosition)malloc(sizeof(courseStatus));
+			if (newCourseStatus == NULL) {
+				printf("malloc error while allocating memory for course status!\n");
+				return MALLOC_ERROR;
+			}
+			newCourseStatus->grade = grade;
+			newCourseStatus->course = course;
+			newCourseStatus->next = NULL;
+			current->next = newCourseStatus;
+			current = current->next;
+
+			gradeSum += grade;
+			num++;
+			totalECTS += current->course->ects;
+			if (grade > 1) currentECTS += current->course->ects;
+		}
+	} while (choice >= 0);
+
+	currentStudent->averageGrade = (float)gradeSum / num;
+	currentStudent->totalEcts = totalECTS;
+	currentStudent->currentEcts = currentECTS;
+
+	char fileName[MAX_CHAR_LENGTH] = "";
+	printf("Name the file to store students courses (without .txt): ");
+	if (scanf("%45s", fileName) != 1) {
+		printf("scanf error!\n");
+		return SCANF_ERROR;
+	}
+	strncat(fileName, ".txt", 4);
+
+	writeStudentCourses(currentStudent, fileName);
+	writeStudent(currentStudent, fileName);
+
+	return EXIT_SUCCESS;
+}
+
+studentPosition findPreviousInList(studentPosition current, studentPosition head) {
+	studentPosition prev = head;
+	while (prev != NULL && prev->next != NULL) {
+		if (prev->next == current) return prev;
+		prev = prev->next;
+	}
+	return NULL;
+}
+
+int freeStudentCourseStatus(studentPosition student) {
+	courseStatusPosition head = student->courses;
+	courseStatusPosition current = head->next;
+	while (current != NULL) {
+		head->next = current->next;
+		current->next = NULL;
+		free(current);
+		current = head->next;
+	}
+	free(head);
+	return EXIT_SUCCESS;
+}
+
+int freeStudent(studentPosition student, studentPosition head) {
+	studentPosition previous = findPreviousInList(student, head);
+	if (previous == NULL) return NULL_PTR_ERROR;
+	previous->next = student->next;
+	student->next = NULL;
+	freeStudentCourseStatus(student);
+	free(student);
+	return EXIT_SUCCESS;
+}
+
+int freeAllStudents(studentPosition head) {
+	studentPosition current = head->next;
+	while (current != NULL) {
+		freeStudent(current, head);
+		current = head->next;
+	}
 	return EXIT_SUCCESS;
 }
