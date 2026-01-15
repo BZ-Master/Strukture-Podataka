@@ -1,7 +1,6 @@
-102	Matematika_2	5
-001	Baze_Podataka	4
-005	Elektronika	3
-012	Programiranje	6
-078	Elektrotehnika	7
-101	Matematika_1	5
-000	Algoritmi	4
+1 Baze_Podataka 4
+5 Elektronika 3
+12 Programiranje 6
+78 Elektrotehnika 7
+101 Matematika_1 5
+102 Matematika_2 5
