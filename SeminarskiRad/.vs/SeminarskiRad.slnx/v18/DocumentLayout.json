@@ -3,14 +3,6 @@
   "WorkspaceRootPath": "C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\source.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|solutionrelative:source.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\courses.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|solutionrelative:courses.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\jjuric.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|solutionrelative:jjuric.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
@@ -25,6 +17,14 @@
     {
       "AbsoluteMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\students.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|solutionrelative:students.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\courses.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|solutionrelative:courses.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\source.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{D4B39B46-387B-4122-BB4A-31066383DE7B}|SeminarskiRad.vcxproj|solutionrelative:source.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -34,17 +34,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 5,
               "Title": "source.c",
               "DocumentMoniker": "C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\source.c",
               "RelativeDocumentMoniker": "source.c",
               "ToolTip": "C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\source.c",
               "RelativeToolTip": "source.c",
-              "ViewState": "AgIAAHwAAAAAAAAAAAAAAHUAAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAGYAAAAAAAAAAAAAAL8DAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
               "WhenOpened": "2026-01-03T13:06:16.17Z",
               "IsPinned": true,
@@ -52,13 +52,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 4,
               "Title": "courses.txt",
               "DocumentMoniker": "C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\courses.txt",
               "RelativeDocumentMoniker": "courses.txt",
               "ToolTip": "C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\courses.txt",
               "RelativeToolTip": "courses.txt",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
               "WhenOpened": "2026-01-04T12:21:34.922Z",
               "IsPinned": true,
@@ -66,13 +66,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 3,
               "Title": "students.txt",
               "DocumentMoniker": "C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\students.txt",
               "RelativeDocumentMoniker": "students.txt",
               "ToolTip": "C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\students.txt",
               "RelativeToolTip": "students.txt",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAaAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
               "WhenOpened": "2026-01-04T12:12:24.679Z",
               "IsPinned": true,
@@ -80,13 +80,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "aantic.txt",
               "DocumentMoniker": "C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\aantic.txt",
               "RelativeDocumentMoniker": "aantic.txt",
               "ToolTip": "C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\aantic.txt",
               "RelativeToolTip": "aantic.txt",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
               "WhenOpened": "2026-01-04T16:02:17.483Z",
               "IsPinned": true,
@@ -94,13 +94,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 1,
               "Title": "llanic.txt",
               "DocumentMoniker": "C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\llanic.txt",
               "RelativeDocumentMoniker": "llanic.txt",
               "ToolTip": "C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\llanic.txt",
               "RelativeToolTip": "llanic.txt",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
               "WhenOpened": "2026-01-10T18:42:39.474Z",
               "IsPinned": true,
@@ -108,7 +108,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "jjuric.txt",
               "DocumentMoniker": "C:\\Users\\Bartul\\Desktop\\Faks\\3. semestar\\Strukture podataka\\SeminarskiRad\\jjuric.txt",
               "RelativeDocumentMoniker": "jjuric.txt",

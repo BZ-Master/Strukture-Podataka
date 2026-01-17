@@ -63,6 +63,10 @@ typedef struct _studentStack {
 courseHashTable initializeHash(int);
 coursePosition findInHash(int, courseHashTable);
 studentPosition findPreviousInList(studentPosition, studentPosition);
+studentPosition findInList(studentPosition);
+float averageGrade(studentPosition);
+int totalEcts(studentPosition);
+int currentEcts(studentPosition);
 int addToHash(int, char*, int, courseHashTable);
 int addToList(char*, char*, int, char*, studentPosition);
 int addStudent(studentPosition, courseHashTable);
@@ -70,13 +74,16 @@ int addCourse(courseHashTable);
 int readStudentFile(char *, studentPosition, courseHashTable);
 int readMainFile(studentPosition, courseHashTable);
 int readCourseFile(courseHashTable);
-int sortAlphabetically();
-int sortByAverageGrade();
+int splitList(studentPosition, studentPosition*, studentPosition*);
+int sortAlphabetically(studentPosition*);
+int sortByAverageGrade(studentPosition*);
+studentPosition mergeSortAlphabetically(studentPosition, studentPosition);
+studentPosition mergeSortByAverageGrade(studentPosition, studentPosition);
 int printAscending(studentPosition);
-int printDescending(studentPosition, studentStackPosition);
+int printDescending(studentPosition);
 int printStudent(studentPosition);
-int printCourses(courseHashTable, studentPosition);
-int printCourse(coursePosition, studentPosition);
+int printCourses(courseHashTable);
+int printCourse(courseHashTable, studentPosition);
 int writeStudent(studentPosition, char*);
 int writeStudents(studentPosition);
 int writeStudentsInCourse(coursePosition, studentPosition);
@@ -93,50 +100,69 @@ int freeHashTable(courseHashTable);
 
 int main() {
 	student head = { "", "", 0, 0.0, 0, 0, NULL, NULL };
-	studentStack stackHead = { NULL, NULL };
 	courseHashTable hashTable = initializeHash(13);
 	readCourseFile(hashTable);
 	readMainFile(&head, hashTable);
-	
+
 	int choice = 0;
+	studentPosition student = NULL;
+
+	printf("0 - End program\n1 - Print student list alphabetically ascending\n2 - Print student list alphabetically descending\n3 - Print student list by average grade ascending\n4 - Print student list by average grade descending\n5 - Print student info\n6 - Print course list\n7 - Print course info\n8 - Add student\n9 - Add course\n10 - Delete student\n11 - Delete course\n");
 	do {
 		printf("Enter a number that corresponds to a function: ");
 		if (scanf("%d", &choice) != 1) {
 			printf("scanf error!\n");
 			break;
 		}
+		printf("\n");
 		switch (choice) {
 		case 0:
 			printf("Ending program...\n");
 			break;
 		case 1:
+			sortAlphabetically(&head.next);
 			printAscending(&head);
 			break;
 		case 2:
-			printDescending(&head, &stackHead);
+			sortAlphabetically(&head.next);
+			printDescending(&head);
 			break;
 		case 3:
-			sortAlphabetically();
+			sortByAverageGrade(&head.next);
+			printAscending(&head);
 			break;
 		case 4:
-			sortByAverageGrade();
+			sortByAverageGrade(&head.next);
+			printDescending(&head);
 			break;
-		case 5:
-			addStudent(&head, hashTable);
+		case 5: 
+			student = findInList(&head);
+			if (student == NULL) printf("Student not found!\n");
+			else printStudent(student);
 			break;
 		case 6:
-			addCourse(hashTable);
+			printCourses(hashTable);
 			break;
 		case 7:
-			deleteStudent(&head);
+			printCourse(hashTable, &head);
 			break;
 		case 8:
+			addStudent(&head, hashTable);
+			break;
+		case 9:
+			addCourse(hashTable);
+			break;
+		case 10:
+			deleteStudent(&head);
+			break;
+		case 11:
 			deleteCourse(&head, hashTable);
 			break;
 		default:
 			printf("Invalid input!\n");
 			break;
 		}
+		printf("\n");
 	} while (choice != 0);
 
 	freeAllStudents(&head);
@@ -151,7 +177,7 @@ courseHashTable initializeHash(int hashSize) {
 		exit(MALLOC_ERROR);
 	}
 	hashTable->size = hashSize;
-	hashTable->hash = (course *)malloc(hashTable->size*sizeof(course));
+	hashTable->hash = (course*)malloc(hashTable->size * sizeof(course));
 	if (hashTable->hash == NULL) {
 		printf("malloc error while allocating hashTable!\n");
 		free(hashTable);
@@ -168,6 +194,23 @@ coursePosition findInHash(int key, courseHashTable hashTable) {
 	while (current != NULL) {
 		if (current->id == key)
 			return current;
+		current = current->next;
+	}
+	return NULL;
+}
+
+studentPosition findInList(studentPosition head) {
+	studentPosition current = head->next;
+	char name[MAX_CHAR_LENGTH] = "", surname[MAX_CHAR_LENGTH] = "";
+	int year = 0;
+	printf("Input name, surname and birth year (ex. John Doe 1999): ");
+	if (scanf("%49s %49s %d", name, surname, &year) != 3) {
+		printf("scanf error!\n");
+		return NULL;
+	}
+
+	while (current != NULL) {
+		if (strcmp(surname, current->surname) == 0 && strcmp(name, current->name) == 0 && year == current->birthYear) return current;
 		current = current->next;
 	}
 	return NULL;
@@ -223,7 +266,6 @@ int readStudentFile(char* fileName, studentPosition student, courseHashTable has
 	}
 
 	int id = 0, grade = 0;
-	int totalECTS = 0, currentECTS = 0, gradeSum = 0, num = 0;
 	courseStatusPosition current = student->courses;
 	while (!feof(studentFile)) {
 		if (fscanf(studentFile, "%d %d", &id, &grade) != 2) {
@@ -245,16 +287,11 @@ int readStudentFile(char* fileName, studentPosition student, courseHashTable has
 		newCourseStatus->next = NULL;
 		current->next = newCourseStatus;
 		current = current->next;
-
-		gradeSum += grade;
-		num++;
-		totalECTS += current->course->ects;
-		if (grade > 1) currentECTS += current->course->ects;
 	}
 
-	if (num > 0) student->averageGrade = (float)gradeSum / num;
-	student->totalEcts = totalECTS;
-	student->currentEcts = currentECTS;
+	student->totalEcts = totalEcts(student);
+	student->currentEcts = currentEcts(student);
+	student->averageGrade = averageGrade(student);
 
 	fclose(studentFile);
 	return EXIT_SUCCESS;
@@ -275,7 +312,7 @@ int readMainFile(studentPosition head, courseHashTable hashTable) {
 	while (current->next != NULL) current = current->next;
 
 	while (!feof(file)) {
-		if (fscanf(file, "%s %s %d %s", surname, name, &year, fileName) != 4) {
+		if (fscanf(file, "%49s %49s %d %49s", surname, name, &year, fileName) != 4) {
 			printf("fscanf error while reading courses!\n");
 			return FSCANF_ERROR;
 		}
@@ -300,7 +337,7 @@ int readCourseFile(courseHashTable hashTable) {
 	char name[MAX_CHAR_LENGTH] = "";
 	int ects = 0;
 	while (!feof(file)) {
-		if (fscanf(file, "%d %s %d", &id, name, &ects) != 3) {
+		if (fscanf(file, "%d %49s %d", &id, name, &ects) != 3) {
 			printf("fscanf error while reading course file!\n");
 			return FSCANF_ERROR;
 		}
@@ -311,11 +348,125 @@ int readCourseFile(courseHashTable hashTable) {
 	return EXIT_SUCCESS;
 }
 
-int sortAlphabetically() {
+float averageGrade(studentPosition student) {
+	int num = 0, sum = 0;
+	courseStatusPosition current = student->courses->next;
+	while (current != NULL) {
+		sum += current->grade;
+		num++;
+		current = current->next;
+	}
+	if (num > 0) return ((float)sum / num);
+	return 0.0;
+}
+
+int totalEcts(studentPosition student) {
+	int total = 0;
+	courseStatusPosition current = student->courses->next;
+	while (current != NULL) {
+		total += current->course->ects;
+		current = current->next;
+	}
+	return total;
+}
+
+int currentEcts(studentPosition student) {
+	int sum = 0;
+	courseStatusPosition current = student->courses->next;
+	while (current != NULL) {
+		if(current->grade > 1) sum += current->course->ects;
+		current = current->next;
+	}
+	return sum;
+}
+
+int splitList(studentPosition start, studentPosition* front, studentPosition* back) {
+	studentPosition fast = start->next;
+	studentPosition slow = start;
+
+	while (fast != NULL) {
+		fast = fast->next;
+		if (fast != NULL) {
+			slow = slow->next;
+			fast = fast->next;
+		}
+	}
+
+	*front = start;
+	*back = slow->next;
+	slow->next = NULL;
 	return EXIT_SUCCESS;
 }
-int sortByAverageGrade() {
+
+int sortAlphabetically(studentPosition* start) {
+	if (*start == NULL || (*start)->next == NULL)
+		return EXIT_SUCCESS;
+
+	studentPosition frontHalf = NULL;
+	studentPosition backHalf = NULL;
+
+	splitList(*start, &frontHalf, &backHalf);
+
+	sortAlphabetically(&frontHalf);
+	sortAlphabetically(&backHalf);
+
+	*start = mergeSortAlphabetically(frontHalf, backHalf);
 	return EXIT_SUCCESS;
+}
+
+
+studentPosition mergeSortAlphabetically(studentPosition a, studentPosition b) {
+	if (a == NULL) return b;
+	else if (b == NULL) return a;
+
+	if (strcmp(a->surname, b->surname) < 0 || 
+		(strcmp(a->surname, b->surname) == 0 && strcmp(a->name, b->name) < 0) || 
+		(strcmp(a->surname, b->surname) == 0 && strcmp(a->name, b->name) == 0 && a->birthYear < b->birthYear)) {
+		a->next = mergeSortAlphabetically(a->next, b);
+		return a;
+	}
+	else {
+		b->next = mergeSortAlphabetically(a, b->next);
+		return b;
+	}	
+}
+
+int sortByAverageGrade(studentPosition* start) {
+	if (*start == NULL || (*start)->next == NULL)
+		return EXIT_SUCCESS;
+
+	studentPosition frontHalf = NULL;
+	studentPosition backHalf = NULL;
+
+	splitList(*start, &frontHalf, &backHalf);
+
+	sortByAverageGrade(&frontHalf);
+	sortByAverageGrade(&backHalf);
+
+	*start = mergeSortByAverageGrade(frontHalf, backHalf);
+	return EXIT_SUCCESS;
+}
+
+
+studentPosition mergeSortByAverageGrade(studentPosition a, studentPosition b) {
+	if (a == NULL) return b;
+	else if (b == NULL) return a;
+
+	if (a->averageGrade < b->averageGrade ||
+		(a->averageGrade == b->averageGrade &&
+			(strcmp(a->surname, b->surname) < 0 ||
+				(strcmp(a->surname, b->surname) == 0 &&
+					(strcmp(a->name, b->name) < 0 ||
+						(strcmp(a->name, b->name) == 0 &&
+							a->birthYear < b->birthYear)))))) 
+	{
+		a->next = mergeSortByAverageGrade(a->next, b);
+		return a;
+	}
+	else {
+		b->next = mergeSortByAverageGrade(a, b->next);
+		return b;
+	}
 }
 
 int printAscending(studentPosition head) {
@@ -328,7 +479,10 @@ int printAscending(studentPosition head) {
 	return EXIT_SUCCESS;
 }
 
-int printDescending(studentPosition head, studentStackPosition stackHead) {
+int printDescending(studentPosition head) {
+	studentStackPosition stackHead = (studentStackPosition)malloc(sizeof(studentStack));
+	stackHead->student = NULL;
+	stackHead->next = NULL;
 	studentPosition current = head->next;
 	while (current != NULL) {
 		studentStackPosition newElement = (studentStackPosition)malloc(sizeof(studentStack));
@@ -350,10 +504,25 @@ int printDescending(studentPosition head, studentStackPosition stackHead) {
 		free(currentStackEl);
 		currentStackEl = stackHead->next;
 	}
+	free(stackHead);
 	return EXIT_SUCCESS;
 }
 
-int printCourse(coursePosition hashEl, studentPosition head) {
+int printCourse(courseHashTable hashTable, studentPosition head) {
+	int id = 0;
+	printf("Enter course ID: ");
+	if (scanf("%d", &id) != 1) {
+		printf("scanf error!\n");
+		return SCANF_ERROR;
+	}
+
+	getchar();
+
+	coursePosition hashEl = findInHash(id, hashTable);
+	if (hashEl == NULL) {
+		printf("Course with ID %d not found!\n", id);
+		return ELEMENT_NOT_FOUND;
+	}
 	printf("COURSE INFO\n-----------------------------------------------------\n");
 	printf("Course ID: %3d\n", hashEl->id);
 	printf("Course name: %s\n", hashEl->name);
@@ -372,16 +541,34 @@ int printCourse(coursePosition hashEl, studentPosition head) {
 		current = current->next;
 	}
 	printf("\n");
+
+	char confirm = ' ';
+	printf("\nDo you wish to write the student list in a file? [y/n]: ");
+	if (scanf("%c", &confirm) != 1) {
+		printf("scanf error!\n");
+		return SCANF_ERROR;
+	}
+
+	switch (confirm) {
+	case 'y':
+		writeStudentsInCourse(hashEl, head);
+		break;
+	case 'n':
+		break;
+	default:
+		printf("INVALID INPUT!\n");
+	}
+
 	return EXIT_SUCCESS;
 }
 
-int printCourses(courseHashTable hashTable, studentPosition head) {
+int printCourses(courseHashTable hashTable) {
 	int i = 0;
+	printf(" ID\tName\tECTS\n");
 	for (i = 0; i < hashTable->size; i++) {
 		coursePosition current = hashTable->hash[i];
 		while (current != NULL) {
-			//printf("%3d\t%s\t%d\n", hashTable->hash[i]->id, hashTable->hash[i]->name, hashTable->hash[i]->ects);
-			printCourse(current, head);
+			printf("%3d\t%s\t%d\n", hashTable->hash[i]->id, hashTable->hash[i]->name, hashTable->hash[i]->ects);
 			current = current->next;
 		}
 	}
@@ -421,7 +608,7 @@ int addCourse(courseHashTable hashTable) {
 	char s[MAX_CHAR_LENGTH] = "";
 
 	printf("Enter course name: ");
-	if (scanf("%s", s) != 1) {
+	if (scanf("%49s", s) != 1) {
 		printf("scanf error!\n");
 		return SCANF_ERROR;
 	}
@@ -467,8 +654,9 @@ int writeStudents(studentPosition head) {
 
 	studentPosition current = head->next;
 	while (current != NULL) {
-		fprintf(file, "%s\t%s\t%d\t%s\n", current->surname, current->name, current->birthYear, current->fileName);
+		fprintf(file, "%s\t%s\t%d\t%s", current->surname, current->name, current->birthYear, current->fileName);
 		current = current->next;
+		if (current != NULL) fprintf(file, "\n");
 	}
 
 	fclose(file);
@@ -516,8 +704,9 @@ int writeStudentCourses(studentPosition student, char* fileName) {
 
 	courseStatusPosition current = student->courses->next;
 	while (current != NULL) {
-		fprintf(file, "%d\t%d\n", current->course->id, current->grade);
+		fprintf(file, "%d\t%d", current->course->id, current->grade);
 		current = current->next;
+		if (current != NULL) fprintf(file, "\n");
 	}
 
 	fclose(file);
@@ -535,8 +724,9 @@ int writeCourses(courseHashTable hashTable) {
 	for (i = 0; i < hashTable->size; i++) {
 		coursePosition current = hashTable->hash[i];
 		while (current != NULL) {
-			fprintf(file, "%d %s %d\n", current->id, current->name, current->ects);
+			fprintf(file, "%d %s %d", current->id, current->name, current->ects);
 			current = current->next;
+			if (current != NULL) fprintf(file, "\n");
 		}
 	}
 
@@ -550,7 +740,7 @@ int addStudent(studentPosition head, courseHashTable hashTable) {
 	int birthYear = 0;
 
 	printf("Enter name surname and birth year (example: John Doe 1999): ");
-	if (scanf("%s %s %d", name, surname, &birthYear) != 3) {
+	if (scanf("%49s %49s %d", name, surname, &birthYear) != 3) {
 		printf("scanf error!\n");
 		return SCANF_ERROR;
 	}
@@ -563,7 +753,6 @@ int addStudent(studentPosition head, courseHashTable hashTable) {
 	studentPosition currentStudent = lastEl->next;
 	courseStatusPosition current = currentStudent->courses;
 	int choice = 0, grade = 0;
-	int totalECTS = 0, currentECTS = 0, gradeSum = 0, num = 0;
 	printf("Enter courses info:\n");
 	do {
 		printf("Enter course ID (enter any negative number to end course inputing): ");
@@ -595,17 +784,12 @@ int addStudent(studentPosition head, courseHashTable hashTable) {
 			newCourseStatus->next = NULL;
 			current->next = newCourseStatus;
 			current = current->next;
-
-			gradeSum += grade;
-			num++;
-			totalECTS += current->course->ects;
-			if (grade > 1) currentECTS += current->course->ects;
 		}
 	} while (choice >= 0);
 
-	if (num > 0) currentStudent->averageGrade = (float)gradeSum / num;
-	currentStudent->totalEcts = totalECTS;
-	currentStudent->currentEcts = currentECTS;
+	currentStudent->totalEcts = totalEcts(currentStudent);
+	currentStudent->currentEcts = currentEcts(currentStudent);
+	currentStudent->averageGrade = averageGrade(currentStudent);
 
 	char fileName[MAX_CHAR_LENGTH] = "";
 	printf("Name the file to store students courses (without .txt): ");
@@ -693,6 +877,9 @@ int deleteCourseStatusFromStudents(coursePosition course, studentPosition head) 
 				prev->next = current->next;
 				free(current);
 				writeStudentCourses(student, student->fileName);
+				student->totalEcts = totalEcts(student);
+				student->currentEcts = currentEcts(student);
+				student->averageGrade = averageGrade(student);
 				break;
 			}
 			prev = current;
@@ -707,7 +894,7 @@ int deleteCourseStatusFromStudents(coursePosition course, studentPosition head) 
 int deleteStudent(studentPosition head) {
 	char surname[MAX_CHAR_LENGTH] = "";
 	printf("Input surname of the student you want to delete: ");
-	if (scanf("%s", surname) != 1) {
+	if (scanf("%49s", surname) != 1) {
 		printf("scanf error!\n");
 		return SCANF_ERROR;
 	}
